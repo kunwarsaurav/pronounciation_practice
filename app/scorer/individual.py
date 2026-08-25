@@ -62,22 +62,32 @@ def transcribe_audio_xai(audio_bytes: bytes, filename: str) -> str:
         print(f"Error calling xAI API: {e}")
         return ""
 
+import imageio_ffmpeg
+from pydub import AudioSegment
+# Set pydub to use the ffmpeg binary from imageio-ffmpeg
+AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
+
 def preprocess_audio(audio_bytes: bytes, target_sr: int = 16000):
-    """Load audio bytes, convert to mono, and resample to target_sr."""
-    # Using torchaudio/librosa to load from bytes
+    """Load audio bytes using pydub (FFmpeg), convert to mono, and resample."""
     file_obj = io.BytesIO(audio_bytes)
-    waveform, sr = torchaudio.load(file_obj)
+    audio = AudioSegment.from_file(file_obj)
     
     # Convert to mono if stereo
-    if waveform.shape[0] > 1:
-        waveform = torch.mean(waveform, dim=0, keepdim=True)
+    if audio.channels > 1:
+        audio = audio.set_channels(1)
         
     # Resample
-    if sr != target_sr:
-        resampler = torchaudio.transforms.Resample(orig_freq=sr, new_freq=target_sr)
-        waveform = resampler(waveform)
+    if audio.frame_rate != target_sr:
+        audio = audio.set_frame_rate(target_sr)
         
-    return waveform.squeeze(0).numpy()
+    # Get raw data as numpy array
+    samples = np.array(audio.get_array_of_samples(), dtype=np.float32)
+    
+    # Normalize to [-1.0, 1.0] (pydub uses PCM depending on sample_width)
+    max_val = float(2**(audio.sample_width * 8 - 1))
+    samples = samples / max_val
+        
+    return samples
 
 def score_individual(target_word: str, audio_bytes: bytes, filename: str = "audio.wav"):
     # 1. Get canonical pronunciation

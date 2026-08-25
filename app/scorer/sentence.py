@@ -6,6 +6,11 @@ import torchaudio
 from openai import OpenAI
 from app.scorer.individual import score_individual
 
+import imageio_ffmpeg
+from pydub import AudioSegment
+# Set pydub to use the ffmpeg binary from imageio-ffmpeg
+AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
+
 def transcribe_audio_with_timestamps(audio_bytes: bytes, filename: str):
     """Uses Grok API via OpenAI client to transcribe audio with word-level timestamps."""
     api_key = os.environ.get("XAI_API_KEY")
@@ -39,25 +44,21 @@ def transcribe_audio_with_timestamps(audio_bytes: bytes, filename: str):
 def extract_audio_segment(audio_bytes: bytes, start_time: float, end_time: float) -> bytes:
     """Extracts a segment of audio given start and end times in seconds."""
     file_obj = io.BytesIO(audio_bytes)
-    waveform, sr = torchaudio.load(file_obj)
+    audio = AudioSegment.from_file(file_obj)
     
-    # Calculate frame indices
-    start_frame = int(start_time * sr)
-    end_frame = int(end_time * sr)
+    start_ms = int(start_time * 1000)
+    end_ms = int(end_time * 1000)
     
-    # Slice waveform
-    segment = waveform[:, start_frame:end_frame]
+    segment = audio[start_ms:end_ms]
     
-    # Save back to bytes
     out_obj = io.BytesIO()
-    torchaudio.save(out_obj, segment, sr, format="wav")
+    segment.export(out_obj, format="wav")
     out_obj.seek(0)
     
     return out_obj.read()
 
-def analyze_speech_rate(waveform, sr, words_count):
+def analyze_speech_rate(duration_seconds: float, words_count: int):
     """Basic speech rate analysis (words per minute)."""
-    duration_seconds = waveform.shape[1] / sr
     if duration_seconds == 0:
         return 0
     wpm = (words_count / duration_seconds) * 60
@@ -116,9 +117,9 @@ def score_sentence(target_word: str, audio_bytes: bytes, filename: str = "audio.
         
     # 4. Analyze whole sentence delivery
     file_obj = io.BytesIO(audio_bytes)
-    waveform, sr = torchaudio.load(file_obj)
+    audio = AudioSegment.from_file(file_obj)
     
-    wpm = analyze_speech_rate(waveform, sr, len(words))
+    wpm = analyze_speech_rate(audio.duration_seconds, len(words))
     
     if wpm < 90:
         feedback.append("Speech rate is quite slow. Try to speak a bit more naturally.")
