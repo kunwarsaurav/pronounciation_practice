@@ -36,7 +36,7 @@ def clean_arpabet(phoneme_list):
             ipa_list.append(ARPABET_TO_IPA[clean_p])
     return ipa_list
 
-def transcribe_audio_xai(audio_bytes: bytes) -> str:
+def transcribe_audio_xai(audio_bytes: bytes, filename: str) -> str:
     """Uses Grok API (xAI) via OpenAI client to transcribe audio."""
     api_key = os.environ.get("XAI_API_KEY")
     if not api_key:
@@ -50,7 +50,7 @@ def transcribe_audio_xai(audio_bytes: bytes) -> str:
     
     # We need to wrap the bytes in a file-like object with a name
     file_obj = io.BytesIO(audio_bytes)
-    file_obj.name = "audio.wav"
+    file_obj.name = filename
     
     try:
         response = client.audio.transcriptions.create(
@@ -79,7 +79,7 @@ def preprocess_audio(audio_bytes: bytes, target_sr: int = 16000):
         
     return waveform.squeeze(0).numpy()
 
-def score_individual(target_word: str, audio_bytes: bytes):
+def score_individual(target_word: str, audio_bytes: bytes, filename: str = "audio.wav"):
     # 1. Get canonical pronunciation
     arpabet_phonemes = g2p(target_word)
     # g2p_en returns punctuation as well, filter it out
@@ -90,7 +90,7 @@ def score_individual(target_word: str, audio_bytes: bytes):
         raise ValueError(f"Could not determine canonical pronunciation for '{target_word}'")
 
     # 2. Run xAI STT
-    transcript = transcribe_audio_xai(audio_bytes)
+    transcript = transcribe_audio_xai(audio_bytes, filename)
     
     # 3. Verify target word
     recognized_word_clean = re.sub(r'[^\w\s]', '', transcript.lower().strip())

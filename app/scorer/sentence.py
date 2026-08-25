@@ -6,7 +6,7 @@ import torchaudio
 from openai import OpenAI
 from app.scorer.individual import score_individual
 
-def transcribe_audio_with_timestamps(audio_bytes: bytes):
+def transcribe_audio_with_timestamps(audio_bytes: bytes, filename: str):
     """Uses Grok API via OpenAI client to transcribe audio with word-level timestamps."""
     api_key = os.environ.get("XAI_API_KEY")
     if not api_key:
@@ -19,7 +19,7 @@ def transcribe_audio_with_timestamps(audio_bytes: bytes):
     )
     
     file_obj = io.BytesIO(audio_bytes)
-    file_obj.name = "audio.wav"
+    file_obj.name = filename
     
     try:
         response = client.audio.transcriptions.create(
@@ -63,9 +63,9 @@ def analyze_speech_rate(waveform, sr, words_count):
     wpm = (words_count / duration_seconds) * 60
     return wpm
 
-def score_sentence(target_word: str, audio_bytes: bytes):
+def score_sentence(target_word: str, audio_bytes: bytes, filename: str = "audio.wav"):
     # 1. Transcribe with timestamps
-    transcription_data = transcribe_audio_with_timestamps(audio_bytes)
+    transcription_data = transcribe_audio_with_timestamps(audio_bytes, filename)
     transcript = transcription_data.get("text", "")
     words = transcription_data.get("words", [])
     

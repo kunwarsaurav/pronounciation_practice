@@ -22,7 +22,7 @@ async def score_individual_endpoint(
         audio_bytes = await audio.read()
         
         # Call the scorer
-        result = score_individual(target_word, audio_bytes)
+        result = score_individual(target_word, audio_bytes, audio.filename)
         
         return result
     except Exception as e:
@@ -46,7 +46,7 @@ async def score_sentence_endpoint(
         audio_bytes = await audio.read()
         
         # Call the scorer
-        result = score_sentence(target_word, audio_bytes)
+        result = score_sentence(target_word, audio_bytes, audio.filename)
         
         return result
     except Exception as e:
