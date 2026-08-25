@@ -142,19 +142,21 @@ def score_individual(target_word: str, audio_bytes: bytes, filename: str = "audi
         prev_ph = ph
         
     # 6. Align expected phonemes with detected phonemes using DTW
-    # To do DTW, we need a numeric representation.
-    # We will use simple character embedding (ASCII values) as proxy for DTW distance,
-    # or just a custom string distance. For fastdtw, we can use a custom distance function.
+    # fastdtw casts arrays to float internally, so we must map phonemes to integers first
+    unique_phonemes = list(set(expected_phonemes + collapsed_detected))
+    ph_to_id = {ph: i for i, ph in enumerate(unique_phonemes)}
     
-    def string_dist(a, b):
-        return 0 if a == b else 1
+    expected_ids = np.array([ph_to_id[ph] for ph in expected_phonemes]).reshape(-1, 1)
+    detected_ids = np.array([ph_to_id[ph] for ph in collapsed_detected]).reshape(-1, 1)
+    
+    def int_dist(a, b):
+        return 0 if a[0] == b[0] else 1
         
-    # Convert lists to 2D numpy arrays for fastdtw
-    expected_np = np.array(expected_phonemes).reshape(-1, 1)
-    detected_np = np.array(collapsed_detected).reshape(-1, 1)
-    
     # Run DTW
-    distance, path = fastdtw(expected_np, detected_np, dist=lambda a, b: string_dist(a[0], b[0]))
+    if len(expected_ids) == 0 or len(detected_ids) == 0:
+        distance, path = 0, []
+    else:
+        distance, path = fastdtw(expected_ids, detected_ids, dist=int_dist)
     
     # 7. Calculate score
     # Path is a list of tuples: (expected_idx, detected_idx)
