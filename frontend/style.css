@@ -423,3 +423,14 @@ header p {
 .feedback-card li:last-child {
     margin-bottom: 0;
 }
+
+/* Footer */
+.app-footer {
+    position: absolute;
+    bottom: 1.5rem;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    letter-spacing: 0.5px;
+}
