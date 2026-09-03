@@ -10,3 +10,6 @@ fastdtw==0.3.4
 scipy==1.13.0
 numpy==1.26.4
 python-dotenv==1.0.1
+librosa==0.10.1
+pydub==0.25.1
+imageio-ffmpeg==0.4.9
