@@ -34,16 +34,19 @@ document.querySelectorAll('input[name="mode"]').forEach(radio => {
 });
 
 // Pre-fill input from vocabulary chips
-function setWord(word) {
-    targetWordInput.value = word;
-    // Highlight the active chip (optional micro-interaction)
-    document.querySelectorAll('.chip').forEach(chip => {
-        chip.style.background = '';
-        chip.style.color = '';
+document.querySelectorAll('.chip').forEach(chip => {
+    chip.addEventListener('click', function() {
+        targetWordInput.value = this.textContent.trim();
+        
+        // Highlight the active chip
+        document.querySelectorAll('.chip').forEach(c => {
+            c.style.background = '';
+            c.style.color = '';
+        });
+        this.style.background = 'var(--primary)';
+        this.style.color = 'white';
     });
-    event.currentTarget.style.background = 'var(--primary)';
-    event.currentTarget.style.color = 'white';
-}
+});
 
 // Setup Media Recorder
 navigator.mediaDevices.getUserMedia({ audio: true })
