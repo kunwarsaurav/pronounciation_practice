@@ -4,7 +4,7 @@ python-multipart==0.0.9
 torch==2.2.2
 torchaudio==2.2.2
 transformers==4.39.3
-openai==1.17.0
+openai>=1.40.0
 g2p_en==2.1.0
 fastdtw==0.3.4
 scipy==1.13.0

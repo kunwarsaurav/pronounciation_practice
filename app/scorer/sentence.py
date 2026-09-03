@@ -12,15 +12,15 @@ from pydub import AudioSegment
 AudioSegment.converter = imageio_ffmpeg.get_ffmpeg_exe()
 
 def transcribe_audio_with_timestamps(audio_bytes: bytes, filename: str):
-    """Uses Grok API via OpenAI client to transcribe audio with word-level timestamps."""
-    api_key = os.environ.get("XAI_API_KEY")
+    """Uses Groq API via OpenAI client to transcribe audio with word-level timestamps."""
+    api_key = os.environ.get("GROQ_API_KEY") or os.environ.get("XAI_API_KEY")
     if not api_key:
-        print("WARNING: XAI_API_KEY not set. Skipping transcription.")
+        print("WARNING: GROQ_API_KEY not set. Skipping transcription.")
         return {"text": "", "words": []}
         
     client = OpenAI(
         api_key=api_key,
-        base_url="https://api.x.ai/v1"
+        base_url="https://api.groq.com/openai/v1"
     )
     
     file_obj = io.BytesIO(audio_bytes)

@@ -1,11 +1,13 @@
 from contextlib import asynccontextmanager
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 from dotenv import load_dotenv
 
 import os
+from dotenv import load_dotenv
 
-# Load environment variables
+# Load environment variables (defaults to .env in the current working directory, which is root)
 load_dotenv()
 
 # We will store loaded models here to be accessed by routers
@@ -42,6 +44,14 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan, title="Pronunciation Practice ML Backend")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # We import the router down here to avoid circular imports if route.py needs to access ml_models
 from app.route.route import router as api_router

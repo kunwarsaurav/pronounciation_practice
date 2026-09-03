@@ -37,15 +37,15 @@ def clean_arpabet(phoneme_list):
     return ipa_list
 
 def transcribe_audio_xai(audio_bytes: bytes, filename: str) -> str:
-    """Uses Grok API (xAI) via OpenAI client to transcribe audio."""
-    api_key = os.environ.get("XAI_API_KEY")
+    """Uses Groq API via OpenAI client to transcribe audio."""
+    api_key = os.environ.get("GROQ_API_KEY") or os.environ.get("XAI_API_KEY")
     if not api_key:
-        print("WARNING: XAI_API_KEY not set. Skipping transcription.")
+        print("WARNING: GROQ_API_KEY not set. Skipping transcription.")
         return ""
         
     client = OpenAI(
         api_key=api_key,
-        base_url="https://api.x.ai/v1"
+        base_url="https://api.groq.com/openai/v1"
     )
     
     # We need to wrap the bytes in a file-like object with a name
@@ -83,9 +83,18 @@ def preprocess_audio(audio_bytes: bytes, target_sr: int = 16000):
     # Get raw data as numpy array
     samples = np.array(audio.get_array_of_samples(), dtype=np.float32)
     
+    if len(samples) == 0:
+        raise ValueError("Audio file is empty or could not be decoded.")
+    
     # Normalize to [-1.0, 1.0] (pydub uses PCM depending on sample_width)
     max_val = float(2**(audio.sample_width * 8 - 1))
     samples = samples / max_val
+    
+    # Pad to at least 0.5 seconds (8000 samples at 16kHz) to avoid Wav2Vec2 convolution errors on extremely short clips
+    min_len = target_sr // 2
+    if len(samples) < min_len:
+        padding = np.zeros(min_len - len(samples), dtype=np.float32)
+        samples = np.concatenate((samples, padding))
         
     return samples
 
