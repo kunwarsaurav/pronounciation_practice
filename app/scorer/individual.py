@@ -41,7 +41,7 @@ def clean_arpabet(phoneme_list):
 
 def transcribe_audio_xai(audio_bytes: bytes, filename: str) -> str:
     """Uses Groq API via OpenAI client to transcribe audio."""
-    api_key = os.environ.get("GROQ_API_KEY") or os.environ.get("XAI_API_KEY")
+    api_key = (os.environ.get("GROQ_API_KEY") or os.environ.get("XAI_API_KEY") or "").strip()
     if not api_key:
         logger.warning("GROQ_API_KEY not set. Skipping transcription.")
         return ""
@@ -214,7 +214,7 @@ def score_individual(target_word: str, audio_bytes: bytes, filename: str = "audi
     if score >= 90:
         feedback.append("Excellent pronunciation!")
     elif substitutions:
-        api_key = os.environ.get("GROQ_API_KEY") or os.environ.get("XAI_API_KEY")
+        api_key = (os.environ.get("GROQ_API_KEY") or os.environ.get("XAI_API_KEY") or "").strip()
         if not api_key:
             for exp, det in substitutions:
                 feedback.append(f"The /{exp}/ sound was pronounced more like /{det}/.")
@@ -228,7 +228,7 @@ def score_individual(target_word: str, audio_bytes: bytes, filename: str = "audi
                 prompt += "\nYou are a friendly English pronunciation coach. Based on these mistakes, provide 1 short, conversational tip to help them improve. Focus ONLY on the biggest mistake rather than listing every error. Speak directly to the user. Then, suggest 2 other similar English words they can practice to master this specific sound (e.g. 'To practice this sound, try saying words like X and Y.'). Do NOT use any technical IPA symbols. Keep it very brief, natural, and encouraging. ALWAYS write your response in English. Put each tip or suggestion on a new line."
                 
                 response = client.chat.completions.create(
-                    model="openai/gpt-oss-20b",
+                    model="llama3-8b-8192",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0.3
                 )
