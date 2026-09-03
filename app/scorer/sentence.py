@@ -3,6 +3,7 @@ import io
 import re
 import torch
 import torchaudio
+import difflib
 from openai import OpenAI
 from app.scorer.individual import score_individual
 
@@ -71,15 +72,31 @@ def score_sentence(target_word: str, audio_bytes: bytes, filename: str = "audio.
     transcript = transcription_data.get("text", "")
     words = transcription_data.get("words", [])
     
-    # 2. Check if target word was used
+    # 2. Check if target word was used (with fuzzy matching for spelling differences)
     target_clean = target_word.lower().strip()
     target_word_data = None
     
+    best_match_ratio = 0
+    best_match_data = None
+    
     for word_info in words:
         w_clean = re.sub(r'[^\w\s]', '', word_info.word.lower().strip())
+        
+        # Perfect match
         if w_clean == target_clean:
             target_word_data = word_info
+            best_match_ratio = 1.0
             break
+            
+        # Fuzzy match (e.g. spelling differences like pronounciation vs pronunciation)
+        ratio = difflib.SequenceMatcher(None, w_clean, target_clean).ratio()
+        if ratio > best_match_ratio:
+            best_match_ratio = ratio
+            best_match_data = word_info
+            
+    # If we didn't find an exact match, but found something very similar (e.g. > 80% similar)
+    if not target_word_data and best_match_ratio > 0.8:
+        target_word_data = best_match_data
             
     target_word_detected = target_word_data is not None
     
@@ -88,6 +105,10 @@ def score_sentence(target_word: str, audio_bytes: bytes, filename: str = "audio.
     feedback = []
     
     if target_word_detected:
+        w_clean = re.sub(r'[^\w\s]', '', target_word_data.word.lower().strip())
+        if w_clean != target_clean:
+            feedback.append(f"We heard '{w_clean}' instead of the exact spelling '{target_word}'. We scored this closest match!")
+            
         # Extract audio segment
         start_time = target_word_data.start
         end_time = target_word_data.end
