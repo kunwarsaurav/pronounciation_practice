@@ -15,14 +15,34 @@ const scoreTitle = document.getElementById('scoreTitle');
 const resTargetWord = document.getElementById('resTargetWord');
 const resRecognizedWord = document.getElementById('resRecognizedWord');
 const feedbackList = document.getElementById('feedbackList');
+const modeInstruction = document.getElementById('modeInstruction');
+
+// Update instruction text on mode change
+document.querySelectorAll('input[name="mode"]').forEach(radio => {
+    radio.addEventListener('change', function() {
+        if (this.value === 'individual') {
+            modeInstruction.textContent = "Pronounce the selected word clearly.";
+        } else {
+            modeInstruction.textContent = "Make a full sentence using the target word.";
+        }
+        
+        // Retrigger fade animation
+        modeInstruction.style.animation = 'none';
+        modeInstruction.offsetHeight; 
+        modeInstruction.style.animation = null; 
+    });
+});
 
 // Pre-fill input from vocabulary chips
 function setWord(word) {
     targetWordInput.value = word;
     // Highlight the active chip (optional micro-interaction)
-    document.querySelectorAll('.chip').forEach(chip => chip.style.background = 'rgba(255, 255, 255, 0.8)');
-    event.target.style.background = 'var(--primary)';
-    event.target.style.color = 'white';
+    document.querySelectorAll('.chip').forEach(chip => {
+        chip.style.background = '';
+        chip.style.color = '';
+    });
+    event.currentTarget.style.background = 'var(--primary)';
+    event.currentTarget.style.color = 'white';
 }
 
 // Setup Media Recorder
