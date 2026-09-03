@@ -3,158 +3,91 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pronunciation Scoring Demo</title>
-    <style>
-        body {
-            font-family: Arial, sans-serif;
-            max-width: 600px;
-            margin: 0 auto;
-            padding: 2rem;
-            line-height: 1.6;
-        }
-        h1 { color: #333; }
-        .form-group { margin-bottom: 1rem; }
-        label { display: block; font-weight: bold; margin-bottom: 0.5rem; }
-        input[type="text"] {
-            width: 100%; padding: 0.5rem; box-sizing: border-box;
-            border: 1px solid #ccc; border-radius: 4px;
-        }
-        .radio-group { margin-bottom: 1rem; }
-        .btn-group { display: flex; gap: 1rem; margin-bottom: 2rem; }
-        button {
-            padding: 0.5rem 1rem; border: none; border-radius: 4px;
-            cursor: pointer; font-weight: bold; color: white;
-        }
-        #recordBtn { background-color: #e74c3c; }
-        #recordBtn:disabled { background-color: #f5b7b1; cursor: not-allowed; }
-        #stopBtn { background-color: #2ecc71; }
-        #stopBtn:disabled { background-color: #a9dfbf; cursor: not-allowed; }
-        
-        #status { font-weight: bold; margin-bottom: 1rem; color: #555; }
-        .recording { color: #e74c3c !important; animation: blink 1s infinite; }
-        
-        @keyframes blink { 50% { opacity: 0.5; } }
-        
-        pre {
-            background: #f4f4f4; padding: 1rem; border-radius: 4px;
-            overflow-x: auto; white-space: pre-wrap; word-wrap: break-word;
-        }
-    </style>
+    <title>Pronunciation Coach</title>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <h1>Pronunciation Practice Demo</h1>
     
-    <div class="form-group">
-        <label for="targetWord">Target Word:</label>
-        <input type="text" id="targetWord" placeholder="e.g., apple, spectacular, pronunciation" required>
+    <div class="background-elements">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
     </div>
 
-    <div class="radio-group">
-        <label>Mode:</label>
-        <input type="radio" id="modeIndividual" name="mode" value="individual" checked>
-        <label for="modeIndividual" style="display:inline; font-weight:normal;">Individual Word</label>
-        
-        <input type="radio" id="modeSentence" name="mode" value="sentence">
-        <label for="modeSentence" style="display:inline; font-weight:normal;">Sentence</label>
-    </div>
+    <main class="glass-container">
+        <header>
+            <h1>Pronunciation Coach</h1>
+            <p>Master your English accent with AI-powered feedback.</p>
+        </header>
 
-    <div class="btn-group">
-        <button id="recordBtn">🎙️ Start Recording</button>
-        <button id="stopBtn" disabled>⏹️ Stop & Score</button>
-    </div>
+        <section class="vocabulary-section">
+            <h3>Suggested Vocabulary</h3>
+            <div class="chips-container" id="vocabChips">
+                <button class="chip" onclick="setWord('pronunciation')">Pronunciation</button>
+                <button class="chip" onclick="setWord('entrepreneur')">Entrepreneur</button>
+                <button class="chip" onclick="setWord('comfortable')">Comfortable</button>
+                <button class="chip" onclick="setWord('vocabulary')">Vocabulary</button>
+                <button class="chip" onclick="setWord('specifically')">Specifically</button>
+            </div>
+        </section>
 
-    <div id="status">Ready.</div>
-    
-    <h3>Result:</h3>
-    <pre id="resultBox">No results yet.</pre>
-
-    <script>
-        let mediaRecorder;
-        let audioChunks = [];
-
-        const recordBtn = document.getElementById('recordBtn');
-        const stopBtn = document.getElementById('stopBtn');
-        const statusEl = document.getElementById('status');
-        const resultBox = document.getElementById('resultBox');
-        
-        // Base URL for your FastAPI backend
-        const API_BASE = "http://localhost:8000";
-
-        // Setup Media Recorder
-        navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
-                mediaRecorder = new MediaRecorder(stream);
-
-                mediaRecorder.ondataavailable = event => {
-                    audioChunks.push(event.data);
-                };
-
-                mediaRecorder.onstop = async () => {
-                    const audioBlob = new Blob(audioChunks, { type: 'audio/wav' });
-                    audioChunks = [];
-                    await sendAudioToBackend(audioBlob);
-                };
-            })
-            .catch(err => {
-                statusEl.textContent = "Error accessing microphone: " + err;
-                console.error(err);
-            });
-
-        recordBtn.onclick = () => {
-            const targetWord = document.getElementById('targetWord').value;
-            if (!targetWord) {
-                alert("Please enter a target word first!");
-                return;
-            }
-            audioChunks = [];
-            mediaRecorder.start();
-            recordBtn.disabled = true;
-            stopBtn.disabled = false;
-            statusEl.textContent = "Recording...";
-            statusEl.classList.add("recording");
-        };
-
-        stopBtn.onclick = () => {
-            mediaRecorder.stop();
-            recordBtn.disabled = false;
-            stopBtn.disabled = true;
-            statusEl.textContent = "Processing... (This might take a few seconds)";
-            statusEl.classList.remove("recording");
-            resultBox.textContent = "Loading...";
-        };
-
-        async function sendAudioToBackend(audioBlob) {
-            const targetWord = document.getElementById('targetWord').value;
-            const mode = document.querySelector('input[name="mode"]:checked').value;
+        <section class="input-section">
+            <div class="input-group">
+                <i class="fa-solid fa-bullseye"></i>
+                <input type="text" id="targetWord" placeholder="Type a word to practice...">
+            </div>
             
-            const formData = new FormData();
-            formData.append("target_word", targetWord);
-            // Append file with a generic .wav name
-            formData.append("audio", audioBlob, "recording.wav");
-            
-            const endpoint = mode === "individual" ? "/score/individual" : "/score/sentence";
-            const url = `${API_BASE}${endpoint}`;
-
-            try {
-                const response = await fetch(url, {
-                    method: "POST",
-                    body: formData
-                });
+            <div class="toggle-container">
+                <input type="radio" id="modeIndividual" name="mode" value="individual" checked>
+                <label for="modeIndividual" class="toggle-label"><i class="fa-solid fa-microphone-lines"></i> Word</label>
                 
-                if (!response.ok) {
-                    const errText = await response.text();
-                    throw new Error(`Server returned ${response.status}: ${errText}`);
-                }
+                <input type="radio" id="modeSentence" name="mode" value="sentence">
+                <label for="modeSentence" class="toggle-label"><i class="fa-solid fa-quote-left"></i> Sentence</label>
+                <div class="toggle-slider"></div>
+            </div>
+        </section>
 
-                const data = await response.json();
-                resultBox.textContent = JSON.stringify(data, null, 2);
-                statusEl.textContent = "Done.";
-            } catch (err) {
-                console.error(err);
-                resultBox.textContent = `Error: ${err.message}`;
-                statusEl.textContent = "Failed to get score.";
-            }
-        }
-    </script>
+        <section class="record-section">
+            <button id="recordBtn" class="record-btn">
+                <div class="mic-icon-wrapper">
+                    <i class="fa-solid fa-microphone"></i>
+                </div>
+                <span>Start Recording</span>
+            </button>
+            <p id="statusMsg" class="status-msg">Ready when you are.</p>
+        </section>
+
+        <section class="results-section hidden" id="resultsSection">
+            <div class="score-card">
+                <div class="circular-progress" id="scoreCircle">
+                    <span class="progress-value" id="scoreValue">0</span>
+                </div>
+                <div class="score-details">
+                    <h3 id="scoreTitle">Great Job!</h3>
+                    <p>Target Word: <strong id="resTargetWord">...</strong></p>
+                    <p>We heard: <strong id="resRecognizedWord">...</strong></p>
+                </div>
+            </div>
+
+            <div class="feedback-card" id="feedbackCard">
+                <h3><i class="fa-solid fa-wand-magic-sparkles"></i> AI Coaching Tips</h3>
+                <ul id="feedbackList">
+                    <!-- Feedback injected here -->
+                </ul>
+            </div>
+        </section>
+
+    </main>
+
+    <script src="script.js"></script>
 </body>
 </html>
