@@ -1,5 +1,5 @@
-// Base URL for FastAPI backend
-const API_BASE = "http://localhost:8000";
+// Base URL for FastAPI backend (Loaded dynamically via Vite Env Var)
+const API_BASE = import.meta.env.VITE_API_BASE || "http://localhost:8000";
 
 let mediaRecorder;
 let audioChunks = [];
