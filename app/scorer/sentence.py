@@ -6,6 +6,9 @@ import torchaudio
 import difflib
 from openai import OpenAI
 from app.scorer.individual import score_individual
+import logging
+
+logger = logging.getLogger(__name__)
 
 import imageio_ffmpeg
 from pydub import AudioSegment
@@ -16,7 +19,7 @@ def transcribe_audio_with_timestamps(audio_bytes: bytes, filename: str):
     """Uses Groq API via OpenAI client to transcribe audio with word-level timestamps."""
     api_key = os.environ.get("GROQ_API_KEY") or os.environ.get("XAI_API_KEY")
     if not api_key:
-        print("WARNING: GROQ_API_KEY not set. Skipping transcription.")
+        logger.warning("GROQ_API_KEY not set. Skipping transcription.")
         return {"text": "", "words": []}
         
     client = OpenAI(
@@ -40,7 +43,7 @@ def transcribe_audio_with_timestamps(audio_bytes: bytes, filename: str):
             "words": response.words if hasattr(response, 'words') else []
         }
     except Exception as e:
-        print(f"Error calling xAI API with timestamps: {e}")
+        logger.error(f"Error calling Whisper API with timestamps: {e}", exc_info=True)
         return {"text": "", "words": []}
 
 def extract_audio_segment(audio_bytes: bytes, start_time: float, end_time: float) -> bytes:
@@ -107,6 +110,7 @@ def score_sentence(target_word: str, audio_bytes: bytes, filename: str = "audio.
     if target_word_detected:
         w_clean = re.sub(r'[^\w\s]', '', target_word_data.word.lower().strip())
         if w_clean != target_clean:
+            logger.info(f"Fuzzy matched '{w_clean}' to target word '{target_word}' (ratio: {best_match_ratio:.2f})")
             feedback.append(f"We heard '{w_clean}' instead of the exact spelling '{target_word}'. We scored this closest match!")
             
         # Extract audio segment
@@ -132,7 +136,7 @@ def score_sentence(target_word: str, audio_bytes: bytes, filename: str = "audio.
                     if "We heard" not in f:
                         feedback.append(f"In '{target_word}': {f}")
         except Exception as e:
-            print(f"Error scoring individual word segment: {e}")
+            logger.error(f"Error scoring individual word segment: {e}", exc_info=True)
             feedback.append(f"Could not analyze target word pronunciation in detail.")
     else:
         feedback.append(f"The required vocabulary word '{target_word}' was not detected in the sentence.")

@@ -3,9 +3,20 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from transformers import Wav2Vec2Processor, Wav2Vec2ForCTC
 from dotenv import load_dotenv
-
 import os
+import sys
+import logging
 from dotenv import load_dotenv
+
+# Configure standard logging
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(name)s - %(levelname)s - %(message)s",
+    handlers=[
+        logging.StreamHandler(sys.stdout)
+    ]
+)
+logger = logging.getLogger(__name__)
 
 # Load environment variables (defaults to .env in the current working directory, which is root)
 load_dotenv()
@@ -16,7 +27,7 @@ ml_models = {}
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     # Load the ML models ONCE at startup
-    print("Loading Wav2Vec2-Phoneme model...")
+    logger.info("Loading Wav2Vec2-Phoneme model...")
     
     # We use a popular fine-tuned phoneme recognition model.
     # Note: Depending on the specific model, the output vocabulary is usually IPA.
@@ -34,13 +45,13 @@ async def lifespan(app: FastAPI):
     ml_models["wav2vec2_model"] = model
     ml_models["device"] = device
     
-    print(f"Model loaded successfully on {device}!")
+    logger.info(f"Model loaded successfully on {device}!")
     
     yield
     
     # Clean up resources on shutdown
     ml_models.clear()
-    print("Models unloaded.")
+    logger.info("Models unloaded.")
 
 
 app = FastAPI(lifespan=lifespan, title="Pronunciation Practice ML Backend")

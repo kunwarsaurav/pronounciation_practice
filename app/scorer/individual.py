@@ -10,6 +10,9 @@ from fastdtw import fastdtw
 from scipy.spatial.distance import euclidean
 import librosa
 from app.main import ml_models
+import logging
+
+logger = logging.getLogger(__name__)
 
 # Initialize G2P
 g2p = G2p()
@@ -40,7 +43,7 @@ def transcribe_audio_xai(audio_bytes: bytes, filename: str) -> str:
     """Uses Groq API via OpenAI client to transcribe audio."""
     api_key = os.environ.get("GROQ_API_KEY") or os.environ.get("XAI_API_KEY")
     if not api_key:
-        print("WARNING: GROQ_API_KEY not set. Skipping transcription.")
+        logger.warning("GROQ_API_KEY not set. Skipping transcription.")
         return ""
         
     client = OpenAI(
@@ -60,7 +63,7 @@ def transcribe_audio_xai(audio_bytes: bytes, filename: str) -> str:
         )
         return response.text
     except Exception as e:
-        print(f"Error calling xAI API: {e}")
+        logger.error(f"Error calling Whisper API: {e}", exc_info=True)
         return ""
 
 import imageio_ffmpeg
@@ -237,7 +240,7 @@ def score_individual(target_word: str, audio_bytes: bytes, filename: str = "audi
                     if clean_line:
                         feedback.append(clean_line)
             except Exception as e:
-                print(f"Error generating LLM feedback: {e}")
+                logger.error(f"Error generating LLM feedback: {e}", exc_info=True)
                 for exp, det in substitutions:
                     feedback.append(f"The /{exp}/ sound was pronounced more like /{det}/.")
             
