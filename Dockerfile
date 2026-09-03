@@ -23,6 +23,9 @@ RUN grep -v "torch" requirements.txt > req_no_torch.txt && \
 # Copy the rest of the application code
 COPY . .
 
+# Download NLTK data required by g2p_en
+RUN python -c "import nltk; nltk.download('averaged_perceptron_tagger_eng'); nltk.download('averaged_perceptron_tagger'); nltk.download('cmudict')"
+
 # Expose port
 EXPOSE 8000
 
