@@ -55,7 +55,8 @@ def transcribe_audio_xai(audio_bytes: bytes, filename: str) -> str:
     try:
         response = client.audio.transcriptions.create(
             model="whisper-large-v3", # Grok API supported whisper model
-            file=file_obj
+            file=file_obj,
+            language="en"
         )
         return response.text
     except Exception as e:
@@ -143,10 +144,18 @@ def score_individual(target_word: str, audio_bytes: bytes, filename: str = "audi
     prev_ph = None
     for i, ph in enumerate(detected_phonemes):
         if ph != '[PAD]' and ph != '<s>' and ph != '</s>' and ph != prev_ph:
-            # Simple cleanup of token formats (like ' ')
+            # Clean up token
             clean_ph = ph.replace(' ', '')
+            
+            # Filter out TIMIT silence/noise markers and word boundaries
+            if clean_ph.lower() in ['h#', 'q', 'sil', 'sp', '|']:
+                continue
+                
             if clean_ph:
-                collapsed_detected.append(clean_ph)
+                # Map detected ARPAbet token to IPA for fair comparison
+                # (Upper case it first to match our dictionary keys)
+                ipa_ph = ARPABET_TO_IPA.get(clean_ph.upper(), clean_ph.lower())
+                collapsed_detected.append(ipa_ph)
                 collapsed_probs.append(probabilities[i])
         prev_ph = ph
         
@@ -201,9 +210,36 @@ def score_individual(target_word: str, audio_bytes: bytes, filename: str = "audi
         
     if score >= 90:
         feedback.append("Excellent pronunciation!")
-    else:
-        for exp, det in substitutions:
-            feedback.append(f"The /{exp}/ sound was pronounced more like /{det}/.")
+    elif substitutions:
+        api_key = os.environ.get("GROQ_API_KEY") or os.environ.get("XAI_API_KEY")
+        if not api_key:
+            for exp, det in substitutions:
+                feedback.append(f"The /{exp}/ sound was pronounced more like /{det}/.")
+        else:
+            try:
+                client = OpenAI(api_key=api_key, base_url="https://api.groq.com/openai/v1")
+                prompt = f"A user is practicing English pronunciation. They tried to say the word '{target_word}'. "
+                prompt += "Instead of the correct sounds, they made these phonetic mistakes (expected -> actual):\n"
+                for exp, det in substitutions:
+                    prompt += f"- Expected /{exp}/, but pronounced it closer to /{det}/\n"
+                prompt += "\nYou are a friendly English pronunciation coach. Based on these mistakes, provide 1 short, conversational tip to help them improve. Focus ONLY on the biggest mistake rather than listing every error. Speak directly to the user. Then, suggest 2 other similar English words they can practice to master this specific sound (e.g. 'To practice this sound, try saying words like X and Y.'). Do NOT use any technical IPA symbols. Keep it very brief, natural, and encouraging. ALWAYS write your response in English. Put each tip or suggestion on a new line."
+                
+                response = client.chat.completions.create(
+                    model="openai/gpt-oss-20b",
+                    messages=[{"role": "user", "content": prompt}],
+                    temperature=0.3
+                )
+                
+                content = response.choices[0].message.content
+                # Parse lines as individual feedback items
+                for line in content.split('\n'):
+                    clean_line = line.strip().lstrip('-').lstrip('*').strip()
+                    if clean_line:
+                        feedback.append(clean_line)
+            except Exception as e:
+                print(f"Error generating LLM feedback: {e}")
+                for exp, det in substitutions:
+                    feedback.append(f"The /{exp}/ sound was pronounced more like /{det}/.")
             
     # Remove duplicates from feedback
     feedback = list(dict.fromkeys(feedback))

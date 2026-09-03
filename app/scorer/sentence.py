@@ -31,7 +31,8 @@ def transcribe_audio_with_timestamps(audio_bytes: bytes, filename: str):
             model="whisper-large-v3",
             file=file_obj,
             response_format="verbose_json",
-            timestamp_granularities=["word"]
+            timestamp_granularities=["word"],
+            language="en"
         )
         return {
             "text": response.text,
