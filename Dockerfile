@@ -12,7 +12,7 @@ RUN apt-get update && apt-get install -y \
 COPY requirements.txt .
 
 # Install PyTorch CPU first to keep image size small (crucial for VPS deployment)
-RUN pip install --no-cache-dir torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+RUN pip install --no-cache-dir torch torchaudio --extra-index-url https://download.pytorch.org/whl/cpu
 
 # Install the rest of the requirements
 # We remove torch and torchaudio from requirements.txt temporarily during this step 
