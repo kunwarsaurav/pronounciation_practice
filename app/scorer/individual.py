@@ -228,7 +228,7 @@ def score_individual(target_word: str, audio_bytes: bytes, filename: str = "audi
                 prompt += "\nYou are a friendly English pronunciation coach. Based on these mistakes, provide 1 short, conversational tip to help them improve. Focus ONLY on the biggest mistake rather than listing every error. Speak directly to the user. Then, suggest 2 other similar English words they can practice to master this specific sound (e.g. 'To practice this sound, try saying words like X and Y.'). Do NOT use any technical IPA symbols. Keep it very brief, natural, and encouraging. ALWAYS write your response in English. Put each tip or suggestion on a new line."
                 
                 response = client.chat.completions.create(
-                    model="llama3-8b-8192",
+                    model="openai/gpt-oss-20b",
                     messages=[{"role": "user", "content": prompt}],
                     temperature=0.3
                 )
