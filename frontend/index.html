@@ -3,97 +3,406 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Pronunciation Coach</title>
+    <title>SYNTHBIT IELTS - Vocabulary & Pronunciation Practice</title>
     
-    <!-- Google Fonts -->
+    <!-- Google Fonts: Outfit & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
     
     <!-- Styles -->
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    
-    <div class="background-elements">
-        <div class="blob blob-1"></div>
-        <div class="blob blob-2"></div>
+    <div class="app-layout">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar" id="sidebar">
+            <div class="sidebar-header">
+                <div class="brand-logo">
+                    <span class="brand-badge">SYNTHB<span class="badge-accent">1</span>T</span>
+                    <span class="brand-ielts">IELTS</span>
+                </div>
+                <button class="sidebar-close-btn" id="sidebarCloseBtn" aria-label="Close Sidebar">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+
+            <nav class="sidebar-nav">
+                <ul class="nav-list">
+                    <li class="nav-item">
+                        <a href="#dashboard" class="nav-link">
+                            <i class="fa-solid fa-table-cells-large nav-icon"></i>
+                            <span>Dashboard</span>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#practice" class="nav-link has-dropdown">
+                            <div class="link-left">
+                                <i class="fa-solid fa-pen-to-square nav-icon"></i>
+                                <span>Practice</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-right nav-arrow"></i>
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#mock-test" class="nav-link">
+                            <i class="fa-solid fa-clipboard-check nav-icon"></i>
+                            <span>Mock Test</span>
+                        </a>
+                    </li>
+                    <li class="nav-item has-submenu open">
+                        <a href="#study-materials" class="nav-link has-dropdown" id="studyMaterialsToggle">
+                            <div class="link-left">
+                                <i class="fa-solid fa-bars-staggered nav-icon nav-icon-materials"></i>
+                                <span>Study Materials</span>
+                            </div>
+                            <i class="fa-solid fa-chevron-down nav-arrow"></i>
+                        </a>
+                        <ul class="submenu">
+                            <li class="submenu-item">
+                                <a href="#notes" class="submenu-link">
+                                    <i class="fa-regular fa-file-lines submenu-icon"></i>
+                                    <span>Notes</span>
+                                </a>
+                            </li>
+                            <li class="submenu-item active">
+                                <a href="#vocabulary" class="submenu-link active">
+                                    <i class="fa-solid fa-language submenu-icon"></i>
+                                    <span>Vocabulary</span>
+                                </a>
+                            </li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a href="#profile" class="nav-link">
+                            <i class="fa-regular fa-user nav-icon"></i>
+                            <span>Profile</span>
+                        </a>
+                    </li>
+                </ul>
+            </nav>
+
+            <div class="sidebar-footer">
+                <a href="#logout" class="nav-link logout-link">
+                    <i class="fa-solid fa-arrow-right-from-bracket nav-icon"></i>
+                    <span>Logout</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content Area -->
+        <div class="main-wrapper">
+            <!-- Top Header Bar -->
+            <header class="top-header">
+                <div class="header-left">
+                    <button class="mobile-menu-btn" id="mobileMenuBtn" aria-label="Toggle Menu">
+                        <i class="fa-solid fa-bars"></i>
+                    </button>
+                    <h1 class="page-title">Vocabulary</h1>
+                </div>
+
+                <div class="header-right">
+                    <!-- See My Plan Button -->
+                    <div class="plan-badge-btn" id="planBtn">
+                        <span class="plan-label">See My Plan</span>
+                        <span class="plan-time">29 DAYS 12 HRS LEFT</span>
+                    </div>
+
+                    <!-- Theme Toggle -->
+                    <button class="theme-toggle-btn" id="themeToggleBtn" aria-label="Toggle Theme" title="Toggle Light/Dark Theme">
+                        <i class="fa-solid fa-sun" id="themeIcon"></i>
+                    </button>
+
+                    <!-- User Avatar -->
+                    <div class="user-avatar" title="User Profile">
+                        <span>j</span>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Dashboard Body -->
+            <main class="dashboard-body">
+                <!-- Hero Banner -->
+                <section class="hero-banner">
+                    <div class="hero-content">
+                        <h2 class="hero-title">Vocabulary</h2>
+                        <p class="hero-subtitle">Master essential IELTS vocabulary with examples and translations.</p>
+                        
+                        <div class="hero-stats">
+                            <div class="stat-item">
+                                <i class="fa-solid fa-book-bookmark"></i>
+                                <span id="wordCountBadge">17 words</span>
+                            </div>
+                            <div class="stat-item">
+                                <i class="fa-solid fa-layer-group"></i>
+                                <span>3 Categories</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Floating Ambient Icons Graphic -->
+                    <div class="hero-graphic" aria-hidden="true">
+                        <div class="ambient-glow"></div>
+                        <div class="floating-bubble bubble-1" title="Reading & Vocab">
+                            <i class="fa-solid fa-book-open"></i>
+                        </div>
+                        <div class="floating-bubble bubble-2" title="Writing & Grammar">
+                            <i class="fa-solid fa-pen"></i>
+                        </div>
+                        <div class="floating-bubble bubble-3" title="Pronunciation & Listening">
+                            <i class="fa-solid fa-headphones"></i>
+                        </div>
+                        <div class="floating-bubble bubble-4" title="Speaking Community">
+                            <i class="fa-solid fa-users"></i>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Search and Filters Section -->
+                <section class="filters-section">
+                    <!-- Search Bar -->
+                    <div class="search-box">
+                        <i class="fa-solid fa-magnifying-glass search-icon"></i>
+                        <input type="text" id="searchInput" placeholder="Search words, meanings, or tags..." autocomplete="off">
+                        <button class="clear-search-btn hidden" id="clearSearchBtn" aria-label="Clear Search">
+                            <i class="fa-solid fa-xmark"></i>
+                        </button>
+                    </div>
+
+                    <!-- Level Tabs -->
+                    <div class="level-filters">
+                        <span class="level-label">LEVEL</span>
+                        <div class="level-tabs" id="levelTabs">
+                            <button class="level-tab active" data-level="All">All</button>
+                            <button class="level-tab" data-level="Easy">Easy</button>
+                            <button class="level-tab" data-level="Medium">Medium</button>
+                            <button class="level-tab" data-level="Hard">Hard</button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Quick Active Practice Callout (Highlights Currently Selected Word) -->
+                <section class="active-practice-banner" id="activePracticeBanner">
+                    <div class="active-practice-content">
+                        <div class="active-practice-badge">
+                            <span class="pulse-indicator"></span>
+                            <span>ACTIVE PRONUNCIATION TARGET</span>
+                        </div>
+                        <div class="active-practice-word-info">
+                            <h3 id="bannerTargetWord">Intrinsic</h3>
+                            <span class="phonetic-badge" id="bannerPhonetic">/ɪnˈtrɪn.zɪk/</span>
+                            <button class="tts-play-btn" id="bannerAudioBtn" title="Listen to Native Pronunciation">
+                                <i class="fa-solid fa-volume-high"></i> Listen
+                            </button>
+                        </div>
+                        <p class="active-practice-desc" id="bannerTargetMeaning">
+                            Existing naturally as an essential quality. Click below to record and get AI phoneme analysis.
+                        </p>
+                    </div>
+                    <div class="active-practice-actions">
+                        <button class="primary-practice-btn" id="bannerPracticeBtn">
+                            <i class="fa-solid fa-microphone-lines"></i>
+                            <span>Practice This Word</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Words Cards Grid -->
+                <section class="vocab-grid-section">
+                    <div class="vocab-grid" id="vocabGrid">
+                        <!-- Populated dynamically via script.js -->
+                    </div>
+                    <div class="no-results hidden" id="noResultsMsg">
+                        <i class="fa-solid fa-magnifying-glass-chart"></i>
+                        <h3>No vocabulary words found</h3>
+                        <p>Try searching for a different term or change the difficulty level filter.</p>
+                        <button class="reset-filter-btn" id="resetFilterBtn">Reset Filters</button>
+                    </div>
+                </section>
+            </main>
+        </div>
     </div>
 
-    <main class="glass-container">
-        <header>
-            <h1>Pronunciation Coach</h1>
-            <p>Master your English accent with AI-powered feedback.</p>
-        </header>
-
-        <section class="vocabulary-section">
-            <h3>Suggested Vocabulary</h3>
-            <div class="chips-container" id="vocabChips">
-                <button class="chip">Pronunciation</button>
-                <button class="chip">Entrepreneur</button>
-                <button class="chip">Comfortable</button>
-                <button class="chip">Vocabulary</button>
-                <button class="chip">Specifically</button>
-            </div>
-        </section>
-
-        <section class="input-section">
-            <div class="input-group">
-                <i class="fa-solid fa-bullseye"></i>
-                <input type="text" id="targetWord" placeholder="Type a word to practice...">
-            </div>
-            
-            <div class="toggle-container">
-                <input type="radio" id="modeIndividual" name="mode" value="individual" checked>
-                <label for="modeIndividual" class="toggle-label"><i class="fa-solid fa-microphone-lines"></i> Word</label>
-                
-                <input type="radio" id="modeSentence" name="mode" value="sentence">
-                <label for="modeSentence" class="toggle-label"><i class="fa-solid fa-quote-left"></i> Sentence</label>
-                <div class="toggle-slider"></div>
-            </div>
-            
-            <p id="modeInstruction" class="mode-instruction">Pronounce the selected word clearly.</p>
-        </section>
-
-        <section class="record-section">
-            <button id="recordBtn" class="record-btn">
-                <div class="mic-icon-wrapper">
-                    <i class="fa-solid fa-microphone"></i>
+    <!-- Practice & Pronunciation Scorer Drawer / Modal Studio -->
+    <div class="practice-drawer-overlay hidden" id="drawerOverlay">
+        <aside class="practice-drawer" id="practiceDrawer" role="dialog" aria-modal="true" aria-labelledby="drawerWordTitle">
+            <!-- Drawer Header -->
+            <div class="drawer-header">
+                <div class="drawer-header-left">
+                    <span class="drawer-tag">
+                        <i class="fa-solid fa-brain"></i> AI Pronunciation Coach
+                    </span>
+                    <div class="drawer-word-row">
+                        <h2 id="drawerWordTitle">Intrinsic</h2>
+                        <span class="drawer-phonetic" id="drawerWordPhonetic">/ɪnˈtrɪn.zɪk/</span>
+                        <button class="tts-icon-btn" id="drawerTtsBtn" title="Listen to native speaker">
+                            <i class="fa-solid fa-volume-high"></i>
+                        </button>
+                    </div>
+                    <span class="drawer-pos" id="drawerWordPos">ADJECTIVE</span>
                 </div>
-                <span>Start Recording</span>
-            </button>
-            <p id="statusMsg" class="status-msg">Ready when you are.</p>
-        </section>
-
-        <section class="results-section hidden" id="resultsSection">
-            <div class="score-card">
-                <div class="circular-progress" id="scoreCircle">
-                    <span class="progress-value" id="scoreValue">0</span>
-                </div>
-                <div class="score-details">
-                    <h3 id="scoreTitle">Great Job!</h3>
-                    <p>Target Word: <strong id="resTargetWord">...</strong></p>
-                    <p>We heard: <strong id="resRecognizedWord">...</strong></p>
-                </div>
+                <button class="drawer-close-btn" id="drawerCloseBtn" aria-label="Close Studio">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
             </div>
 
-            <div class="feedback-card" id="feedbackCard">
-                <h3><i class="fa-solid fa-wand-magic-sparkles"></i> AI Coaching Tips</h3>
-                <ul id="feedbackList">
-                    <!-- Feedback injected here -->
-                </ul>
+            <!-- Drawer Body -->
+            <div class="drawer-body">
+                <!-- Word Definition & Sentence Box -->
+                <div class="word-context-card">
+                    <div class="context-item">
+                        <span class="context-label">Definition:</span>
+                        <p id="drawerWordMeaning">Existing naturally as an essential quality.</p>
+                    </div>
+                    <div class="context-item">
+                        <span class="context-label">IELTS Practice Sentence:</span>
+                        <p class="sentence-text" id="drawerWordSentence">Trust is an <strong class="highlight-target">intrinsic</strong> component of any healthy partnership.</p>
+                    </div>
+                </div>
+
+                <!-- Mode Selector (Word vs Sentence) -->
+                <div class="mode-toggle-group">
+                    <span class="mode-heading">Practice Mode:</span>
+                    <div class="mode-selector">
+                        <input type="radio" id="modeIndividual" name="practiceMode" value="individual" checked>
+                        <label for="modeIndividual" class="mode-tab">
+                            <i class="fa-solid fa-microphone"></i>
+                            <span>Single Word</span>
+                        </label>
+
+                        <input type="radio" id="modeSentence" name="practiceMode" value="sentence">
+                        <label for="modeSentence" class="mode-tab">
+                            <i class="fa-solid fa-quote-left"></i>
+                            <span>Full Sentence</span>
+                        </label>
+                        <div class="mode-slider"></div>
+                    </div>
+                    <p class="mode-hint" id="modeHintText">Pronounce the target word clearly into your microphone.</p>
+                </div>
+
+                <!-- Audio Recording & Live Waveform Studio -->
+                <div class="recording-studio">
+                    <!-- Live Canvas Waveform -->
+                    <div class="waveform-container">
+                        <canvas id="waveformCanvas" width="400" height="70"></canvas>
+                        <div class="waveform-overlay" id="waveformPlaceholder">
+                            <i class="fa-solid fa-wave-square"></i>
+                            <span>Audio visualizer will activate during recording</span>
+                        </div>
+                    </div>
+
+                    <!-- Record Button -->
+                    <div class="record-btn-container">
+                        <button class="studio-record-btn" id="studioRecordBtn">
+                            <div class="record-icon-halo"></div>
+                            <div class="record-icon-wrapper">
+                                <i class="fa-solid fa-microphone" id="studioRecordIcon"></i>
+                            </div>
+                            <span id="studioRecordLabel">Start Recording</span>
+                        </button>
+                        <div class="timer-display hidden" id="recordTimer">00:00</div>
+                    </div>
+
+                    <!-- Status Text -->
+                    <p class="studio-status" id="studioStatus">Click the button above to begin pronunciation practice.</p>
+                </div>
+
+                <!-- Scorer Results Section -->
+                <div class="scorer-results-card hidden" id="drawerResults">
+                    <div class="results-header">
+                        <h4><i class="fa-solid fa-chart-simple"></i> Pronunciation Analysis</h4>
+                        
+                    </div>
+
+                    <!-- Score Card Grid -->
+                    <div class="score-summary-row">
+                        <!-- Circular Animated Gauge -->
+                        <div class="gauge-card">
+                            <div class="circular-progress" id="drawerScoreCircle">
+                                <span class="progress-val" id="drawerScoreVal">0</span>
+                                <span class="progress-unit">%</span>
+                            </div>
+                            <span class="score-verdict-tag" id="drawerVerdict">Analyzing...</span>
+                        </div>
+
+                        <!-- Recognition Details -->
+                        <div class="recognition-card">
+                            <div class="detail-row">
+                                <span class="detail-label">Target Word:</span>
+                                <span class="detail-val target-val" id="resTarget">Intrinsic</span>
+                            </div>
+                            <div class="detail-row">
+                                <span class="detail-label">What We Heard:</span>
+                                <span class="detail-val heard-val" id="resHeard">Intrinsic</span>
+                            </div>
+                            <div class="detail-row" id="matchStatusRow">
+                                <span class="detail-label">Phoneme Match:</span>
+                                <span class="detail-badge success" id="resMatchBadge">Match Confirmed</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Phoneme Sounds Breakdown -->
+                    <div class="phonemes-breakdown-card" id="phonemesCard">
+                        <h5><i class="fa-solid fa-headphones-simple"></i> Phonetic Sound Analysis</h5>
+                        <div class="phoneme-columns">
+                            <div class="phoneme-col">
+                                <span class="col-title">Expected Sounds:</span>
+                                <div class="phoneme-chips" id="expectedPhonemes">
+                                    <span class="phoneme-chip">/ɪ/</span>
+                                    <span class="phoneme-chip">/n/</span>
+                                    <span class="phoneme-chip">/t/</span>
+                                    <span class="phoneme-chip">/r/</span>
+                                    <span class="phoneme-chip">/ɪ/</span>
+                                    <span class="phoneme-chip">/n/</span>
+                                    <span class="phoneme-chip">/z/</span>
+                                    <span class="phoneme-chip">/ɪ/</span>
+                                    <span class="phoneme-chip">/k/</span>
+                                </div>
+                            </div>
+                            <div class="phoneme-col">
+                                <span class="col-title">Detected Sounds:</span>
+                                <div class="phoneme-chips" id="detectedPhonemes">
+                                    <span class="phoneme-chip match">/ɪ/</span>
+                                    <span class="phoneme-chip match">/n/</span>
+                                    <span class="phoneme-chip match">/t/</span>
+                                    <span class="phoneme-chip match">/r/</span>
+                                    <span class="phoneme-chip match">/ɪ/</span>
+                                    <span class="phoneme-chip match">/n/</span>
+                                    <span class="phoneme-chip match">/z/</span>
+                                    <span class="phoneme-chip match">/ɪ/</span>
+                                    <span class="phoneme-chip match">/k/</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- AI Coaching Tips -->
+                    <div class="ai-coaching-card" id="drawerCoachingCard">
+                        <h5><i class="fa-solid fa-wand-magic-sparkles"></i> AI Coaching Tips</h5>
+                        <ul class="coaching-list" id="drawerFeedbackList">
+                            <!-- Injected dynamically -->
+                        </ul>
+                    </div>
+
+                    <!-- Action Footer -->
+                    <div class="results-actions">
+                        <button class="retry-btn" id="retryPracticeBtn">
+                            <i class="fa-solid fa-rotate-left"></i> Practice Again
+                        </button>
+                        <button class="next-word-btn" id="nextWordBtn">
+                            Next Word <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                </div>
             </div>
-        </section>
+        </aside>
+    </div>
 
-    </main>
-
-    <footer class="app-footer">
-        &copy; 2026 SynthBit. All Rights Reserved.
-    </footer>
-
+    <!-- Script -->
     <script type="module" src="script.js"></script>
 </body>
 </html>
